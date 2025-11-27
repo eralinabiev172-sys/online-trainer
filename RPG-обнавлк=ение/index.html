@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Life RPG – Super Project</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>🌍 Life RPG – Прокачай себя</header>
+
+  <div class="nav">
+    <button onclick="showPage('testPage')">Тест</button>
+    <button onclick="showPage('statsPage')">Характеристики</button>
+    <button onclick="showPage('tasksPage')">Задания</button>
+    <button onclick="showPage('studyPage')">Учёба</button>
+    <button onclick="showPage('businessPage')">Бизнес</button>
+    <button onclick="showPage('progressPage')">Прогресс</button>
+  </div>
+
+  <!-- Тест -->
+  <div class="page active" id="testPage">
+    <div class="card">
+      <h2>Ввод данных</h2>
+      <label>Рост (см): <input type="number" id="heightInput" value="170"></label>
+      <label>Вес (кг): <input type="number" id="weightInput" value="70"></label>
+      <label>Жир (%): <input type="number" id="fatInput" value="18"></label>
+      <label>Бег 100м (сек): <input type="number" id="runInput" value="15"></label>
+      <label>Отжимания (за день): <input type="number" id="pushupsInput" value="0"></label>
+      <label>Планка (мин): <input type="number" id="plankInput" value="1"></label>
+      <label>Сон (ч/сут): <input type="number" id="sleepInput" value="7"></label>
+      <label>Телефон (ч/сут): <input type="number" id="phoneInput" value="5"></label>
+
+      <h3>Личность</h3>
+      <label>Математика (1–11 класс): <input type="number" id="mathLevelInput" value="1"></label>
+      <label>Уверенность (1–10): <input type="number" id="confidenceInput" value="5"></label>
+      <label>Харизма (1–10): <input type="number" id="charismaInput" value="5"></label>
+      <label>Чтение (стр/день): <input type="number" id="readingInput" value="5"></label>
+
+      <h3>Болезни</h3>
+      <label><input type="checkbox" id="curseBackInput"> Больная спина</label>
+      <label><input type="checkbox" id="curseFootInput"> Больная нога</label>
+      <label><input type="checkbox" id="curseCoughInput"> Кашель</label>
+      <label><input type="checkbox" id="curseHeartInput"> Проблемы с сердцем</label>
+      <label><input type="checkbox" id="curseVisionInput"> Плохое зрение</label>
+      <label><input type="checkbox" id="curseAsthmaInput"> Астма</label>
+      <label><input type="checkbox" id="curseStomachInput"> Проблемы с желудком</label>
+
+      <button class="action" onclick="initUser()">Сохранить</button>
+    </div>
+  </div>
+
+  <!-- Характеристики -->
+  <div class="page" id="statsPage">
+    <div class="card">
+      <h2>Характеристики</h2>
+      <ul>
+        <li>Сила: <span id="strength">0</span></li>
+        <li>Ловкость: <span id="agility">0</span></li>
+        <li>Выносливость: <span id="endurance">0</span></li>
+        <li>Интеллект: <span id="intellect">0</span></li>
+        <li>Уверенность: <span id="confidence">0</span></li>
+        <li>Харизма: <span id="charisma">0</span></li>
+      </ul>
+      <p id="weeklyMessage"></p>
+    </div>
+  </div>
+
+  <!-- Задания -->
+  <div class="page" id="tasksPage">
+    <div class="card">
+      <h2>Задания</h2>
+      <ul id="tasks"></ul>
+    </div>
+    <div class="card">
+      <h2>Рекомендации</h2>
+      <ul id="recommendations"></ul>
+    </div>
+  </div>
+
+  <!-- Учёба -->
+  <div class="page" id="studyPage">
+    <div class="card">
+      <h2>Учебные тесты</h2>
+      <label>Выберите язык:</label>
+      <select id="languageSelect"></select>
+      <button onclick="startTest()">Начать тест</button>
+    </div>
+    <div id="testArea" class="card" style="display:none;">
+      <h3 id="testTitle">Тест</h3>
+      <div id="questions"></div>
+      <button onclick="checkAnswers()">Проверить</button>
+      <div id="result"></div>
+    </div>
+  </div>
+
+  <!-- Бизнес -->
+  <div class="page" id="businessPage">
+    <div class="card">
+      <h2>Бизнес-тренажёр</h2>
+      <p id="aiQuestion">ИИ: Продай мне ручку.</p>
+      <input type="text" id="sellInput" placeholder="Ваш ответ...">
+      <button onclick="evaluateBusiness()">Отправить</button>
+      <p id="businessResult"></p>
+    </div>
+  </div>
+
+  <!-- Прогресс -->
+  <div class="page" id="progressPage">
+    <div class="card">
+      <h2>Прогресс</h2>
+      <canvas id="progressChart" width="400" height="200"></canvas>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
