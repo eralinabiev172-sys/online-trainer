@@ -1,17 +1,32 @@
-/* Общие стили */
+/* Общие стили - RPG Dark Mode */
+:root {
+  --primary: #4a90e2;
+  --secondary: #2c3e50;
+  --accent: #e74c3c;
+  --bg: #1a1a2e;
+  --card-bg: #ffffff;
+  --text: #333;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background: #f0f0f0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--text);
   margin: 0;
   padding: 0;
+  line-height: 1.6;
 }
 
 header {
-  background: #333;
+  background: linear-gradient(135deg, #16213e, #0f3460);
   color: #fff;
   text-align: center;
-  padding: 15px;
-  font-size: 20px;
+  padding: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 /* Навигация */
@@ -19,28 +34,42 @@ header {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  background: #444;
+  background: #16213e;
+  padding: 10px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .nav button {
-  background: #666;
-  color: #fff;
-  border: none;
-  padding: 10px 15px;
+  background: transparent;
+  color: #95a5a6;
+  border: 2px solid #95a5a6;
+  padding: 8px 16px;
   margin: 5px;
   cursor: pointer;
-  border-radius: 5px;
-  transition: 0.3s;
+  border-radius: 20px;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
-.nav button:hover {
-  background: #888;
+.nav button:hover, .nav button.active-nav {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 0 15px rgba(74, 144, 226, 0.5);
 }
 
 /* Страницы */
 .page {
   display: none;
   padding: 20px;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .page.active {
@@ -49,78 +78,119 @@ header {
 
 /* Карточки */
 .card {
-  background: #fff;
+  background: var(--card-bg);
   margin: 20px auto;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 600px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  padding: 25px;
+  border-radius: 15px;
+  max-width: 650px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* Кнопки действий */
-button.action {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  margin-top: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button.action:hover {
-  background: #0056b3;
+.card h2 {
+  margin-top: 0;
+  color: var(--secondary);
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
 }
 
 /* Поля ввода */
-input, select {
+label {
   display: block;
-  margin: 5px 0 15px;
-  padding: 8px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+input[type="number"], 
+input[type="text"], 
+select {
   width: 100%;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 2px solid #dfe6e9;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
 }
 
-/* Списки заданий и рекомендаций */
-#tasks, #recommendations {
-  padding-left: 20px;
+input:focus {
+  border-color: var(--primary);
+  outline: none;
 }
 
-#tasks li, #recommendations li {
-  margin-bottom: 8px;
+/* Чекбоксы (Дебаффы) */
+.checkbox-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
 }
 
-/* Тестовая зона */
-#testArea input {
-  width: calc(100% - 10px);
+.checkbox-group label {
+  font-weight: normal;
+  font-size: 14px;
+  cursor: pointer;
 }
 
-/* График прогресса */
-canvas#progressChart {
-  max-width: 100%;
-  height: auto;
+/* Кнопки действий */
+button.action-btn {
+  background: linear-gradient(to right, #4a90e2, #357abd);
+  color: white;
+  border: none;
+  padding: 15px 25px;
+  width: 100%;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+  transition: 0.2s;
 }
 
-/* Адаптивность для мобильных */
+button.action-btn:active {
+  transform: scale(0.98);
+}
+
+/* Списки характеристик */
+.stats-list {
+  list-style: none;
+  padding: 0;
+}
+
+.stats-list li {
+  background: #f1f2f6;
+  margin-bottom: 10px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+}
+
+.stats-list span {
+  color: var(--primary);
+  font-size: 1.2em;
+}
+
+/* Тесты */
+.test-item {
+  background: #f9f9f9;
+  padding: 10px;
+  border-left: 4px solid var(--primary);
+  margin-bottom: 10px;
+}
+
+/* Адаптивность */
 @media (max-width: 600px) {
+  .checkbox-group {
+    grid-template-columns: 1fr;
+  }
+  
   .nav button {
-    padding: 8px 10px;
-    font-size: 14px;
-  }
-
-  .card {
-    padding: 15px;
-    margin: 15px 10px;
-  }
-
-  input, select {
-    font-size: 14px;
-  }
-
-  header {
-    font-size: 18px;
+    flex: 1 1 40%;
+    font-size: 12px;
   }
 }

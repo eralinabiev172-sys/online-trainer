@@ -5,205 +5,219 @@ let progressChart = null;
 
 // === Показ страниц ===
 function showPage(id) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    const targetPage = document.getElementById(id);
+    if (targetPage) targetPage.classList.add("active");
 }
 
 // === Инициализация пользователя ===
 function initUser() {
-  userData = {
-    height: +document.getElementById("heightInput").value,
-    weight: +document.getElementById("weightInput").value,
-    fat: +document.getElementById("fatInput").value,
-    runSec: +document.getElementById("runInput").value,
-    pushups: +document.getElementById("pushupsInput").value,
-    plankMin: +document.getElementById("plankInput").value,
-    sleep: +document.getElementById("sleepInput").value,
-    phone: +document.getElementById("phoneInput").value,
-    mathLevel: +document.getElementById("mathLevelInput").value,
-    confidence: +document.getElementById("confidenceInput").value,
-    charisma: +document.getElementById("charismaInput").value,
-    reading: +document.getElementById("readingInput").value,
+    userData = {
+        height: Number(document.getElementById("heightInput").value) || 0,
+        weight: Number(document.getElementById("weightInput").value) || 0,
+        fat: Number(document.getElementById("fatInput").value) || 0,
+        runSec: Number(document.getElementById("runInput").value) || 0,
+        pushups: Number(document.getElementById("pushupsInput").value) || 0,
+        plankMin: Number(document.getElementById("plankInput").value) || 0,
+        sleep: Number(document.getElementById("sleepInput").value) || 0,
+        phone: Number(document.getElementById("phoneInput").value) || 0,
+        mathLevel: Number(document.getElementById("mathLevelInput").value) || 1,
+        confidence: Number(document.getElementById("confidenceInput").value) || 5,
+        charisma: Number(document.getElementById("charismaInput").value) || 5,
+        reading: Number(document.getElementById("readingInput").value) || 0,
 
-    // болезни
-    curseBack: document.getElementById("curseBackInput").checked,
-    curseFoot: document.getElementById("curseFootInput").checked,
-    curseCough: document.getElementById("curseCoughInput").checked,
-    curseHeart: document.getElementById("curseHeartInput").checked,
-    curseVision: document.getElementById("curseVisionInput").checked,
-    curseAsthma: document.getElementById("curseAsthmaInput").checked,
-    curseStomach: document.getElementById("curseStomachInput").checked,
+        // болезни
+        curses: {
+            back: document.getElementById("curseBackInput").checked,
+            foot: document.getElementById("curseFootInput").checked,
+            cough: document.getElementById("curseCoughInput").checked,
+            heart: document.getElementById("curseHeartInput").checked,
+            vision: document.getElementById("curseVisionInput").checked,
+            asthma: document.getElementById("curseAsthmaInput").checked,
+            stomach: document.getElementById("curseStomachInput").checked,
+        },
 
-    // недельная прокачка
-    weekly: {
-      pushups: 0,
-      plank: 0,
-      run: 0,
-      reading: 0,
-      math: 0,
-      confidence: 0
-    }
-  };
+        // недельная прокачка (очки опыта)
+        weekly: {
+            pushups: 0,
+            plank: 0,
+            run: 0,
+            reading: 0,
+            math: 0,
+            confidence: 0
+        }
+    };
 
-  updateStats();
-  generateTasks();
-  drawProgress();
-  showPage('statsPage');
+    updateStats();
+    generateTasks();
+    drawProgress();
+    showPage('statsPage');
 }
 
 // === Расчет характеристик ===
 function calculateStats() {
-  const clamp = (v, min, max) => Math.max(min, Math.min(max, Math.round(v)));
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, Math.round(v)));
 
-  let strength = clamp(userData.pushups / 20 * 10 + Math.floor(userData.weekly.pushups / 30), 1, 10);
-  let agility = clamp(userData.runSec < 15 ? 10 : 5 + Math.floor(userData.weekly.run / 10), 1, 10);
-  let endurance = clamp(userData.plankMin / 5 * 10 + Math.floor(userData.weekly.plank / 5), 1, 10);
-  let intellect = clamp(userData.mathLevel / 11 * 10 + Math.floor(userData.weekly.math / 5), 1, 10);
-  let confidence = clamp(userData.confidence + Math.floor(userData.weekly.confidence / 3), 1, 10);
-  let charisma = clamp(userData.charisma + Math.floor(userData.weekly.reading / 10), 1, 10);
+    // Формулы расчета (можно настраивать баланс здесь)
+    let strength = clamp((userData.pushups / 5) + (userData.weekly.pushups / 10), 1, 10);
+    let agility = clamp(userData.runSec <= 13 ? 10 : (25 - userData.runSec) / 1.2, 1, 10);
+    let endurance = clamp(userData.plankMin * 2 + (userData.weekly.plank / 5), 1, 10);
+    let intellect = clamp(userData.mathLevel + (userData.weekly.math / 5), 1, 10);
+    let confidence = clamp(userData.confidence + (userData.weekly.confidence / 3), 1, 10);
+    let charisma = clamp(userData.charisma + (userData.reading / 20), 1, 10);
 
-  return { strength, agility, endurance, intellect, confidence, charisma };
+    return { strength, agility, endurance, intellect, confidence, charisma };
 }
 
 function updateStats() {
-  let stats = calculateStats();
-  for (let key in stats) {
-    document.getElementById(key).innerText = stats[key];
-  }
+    let stats = calculateStats();
+    for (let key in stats) {
+        const el = document.getElementById(key);
+        if (el) el.innerText = stats[key];
+    }
 }
 
 // === Задания и рекомендации ===
 function generateTasks() {
-  const tasks = [];
-  const recs = [];
+    const tasks = [];
+    const recs = [];
 
-  if (!userData.curseBack) tasks.push("Сделать 10 отжиманий");
-  if (!userData.curseBack) tasks.push("Планка 2 минуты");
-  if (userData.mathLevel < 6) tasks.push("Решить 5 задач по математике");
-  if (userData.reading < 10) tasks.push("Прочитать 10 страниц книги");
-  if (userData.confidence < 5) tasks.push("Поздороваться с 3 незнакомыми людьми");
+    // Квесты на основе данных
+    if (!userData.curses.back) tasks.push("Сделать 2 подхода отжиманий");
+    if (userData.plankMin < 3) tasks.push("Продержаться в планке на 30 сек дольше");
+    if (userData.mathLevel < 11) tasks.push("Решить тест по математике");
+    if (userData.reading < 20) tasks.push("Прочитать 15 страниц любой книги");
 
-  if (userData.curseBack) recs.push("Не поднимать тяжести, делать лёгкую зарядку");
-  if (userData.curseFoot) recs.push("Избегать долгой ходьбы, отдыхать");
-  if (userData.curseCough) recs.push("Больше отдыхать, пить тёплое");
-  if (userData.curseHeart) recs.push("Не делать тяжёлое кардио, лучше лёгкая йога");
-  if (userData.curseVision) recs.push("Гимнастика для глаз, отдых от экрана");
-  if (userData.curseAsthma) recs.push("Избегать бега на холоде, полезно плавание");
-  if (userData.curseStomach) recs.push("Не переедать, лёгкие прогулки и растяжка");
+    // Рекомендации по дебаффам (болезням)
+    if (userData.curses.back) recs.push("⚠️ Внимание: Спина слабая. Только растяжка и йога.");
+    if (userData.curses.heart) recs.push("⚠️ Кардио под запретом. Контролируй пульс.");
+    if (userData.curses.vision) recs.push("👁 Делай гимнастику для глаз каждые 2 часа.");
 
-  document.getElementById("tasks").innerHTML = tasks.map(t => `<li>${t}</li>`).join("");
-  document.getElementById("recommendations").innerHTML = recs.map(r => `<li>${r}</li>`).join("");
+    document.getElementById("tasks").innerHTML = tasks.map(t => `<li>🔹 ${t}</li>`).join("");
+    document.getElementById("recommendations").innerHTML = recs.map(r => `<li>${r}</li>`).join("");
 }
 
-// === Прогресс ===
+// === Прогресс (Радарная диаграмма) ===
+
 function drawProgress() {
-  let stats = calculateStats();
-  let ctx = document.getElementById("progressChart").getContext("2d");
+    let stats = calculateStats();
+    let ctx = document.getElementById("progressChart").getContext("2d");
 
-  if (progressChart) progressChart.destroy();
+    if (progressChart) progressChart.destroy();
 
-  progressChart = new Chart(ctx, {
-    type: "radar",
-    data: {
-      labels: ["Сила", "Ловкость", "Выносливость", "Интеллект", "Уверенность", "Харизма"],
-      datasets: [{
-        label: "Характеристики",
-        data: Object.values(stats),
-        fill: true,
-        backgroundColor: "rgba(0,123,255,0.2)",
-        borderColor: "rgba(0,123,255,1)"
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        r: {
-          min: 0,
-          max: 10,
-          ticks: { stepSize: 1 }
+    progressChart = new Chart(ctx, {
+        type: "radar",
+        data: {
+            labels: ["Сила", "Ловкость", "Выносливость", "Интеллект", "Уверенность", "Харизма"],
+            datasets: [{
+                label: "Твои навыки",
+                data: [stats.strength, stats.agility, stats.endurance, stats.intellect, stats.confidence, stats.charisma],
+                backgroundColor: "rgba(255, 99, 132, 0.2)",
+                borderColor: "rgba(255, 99, 132, 1)",
+                pointBackgroundColor: "rgba(255, 99, 132, 1)",
+            }]
+        },
+        options: {
+            scales: {
+                r: {
+                    min: 0,
+                    max: 10,
+                    beginAtZero: true,
+                    ticks: { stepSize: 2 }
+                }
+            }
         }
-      }
-    }
-  });
+    });
 }
 
-// === Тестирование (4 класс + англо-русский) ===
+// === Тестирование ===
 const vocabularies = {
-  english: {
-    hello: "привет",
-    world: "мир",
-    book: "книга",
-    school: "школа",
-    water: "вода",
-    food: "еда",
-    friend: "друг",
-    family: "семья",
-    love: "любовь",
-    day: "день"
-  }
+    english: {
+        hello: "привет",
+        world: "мир",
+        book: "книга",
+        school: "школа",
+        water: "вода"
+    }
 };
 
 function startTest() {
-  const lang = document.getElementById("languageSelect").value;
-  document.getElementById("testArea").style.display = "block";
-  document.getElementById("questions").innerHTML = "";
+    const lang = document.getElementById("languageSelect").value;
+    const testArea = document.getElementById("testArea");
+    const questionsDiv = document.getElementById("questions");
+    
+    testArea.style.display = "block";
+    questionsDiv.innerHTML = "";
+    currentQuestions = [];
 
-  let mathQ = [];
-  for (let i = 0; i < 10; i++) {
-    let a = Math.floor(Math.random() * 10 * (userData.mathLevel || 1)) + 1;
-    let b = Math.floor(Math.random() * 10 * (userData.mathLevel || 1)) + 1;
-    let type = ["+", "-", "*", "/"][Math.floor(Math.random() * 4)];
-    let qText, ans;
-    if (type === "+") { qText = `${a}+${b}=?`; ans = a + b; }
-    else if (type === "-") { qText = `${a}-${b}=?`; ans = a - b; }
-    else if (type === "*") { qText = `${a}*${b}=?`; ans = a * b; }
-    else { qText = `${a* b}/${b}=?`; ans = a; } // деление нацело
-    mathQ.push({ q: qText, answer: ans });
-  }
-
-  let vocabQ = [];
-  if (lang === "english") {
-    for (let key in vocabularies.english) {
-      vocabQ.push({ q: `Переведи на русский: ${key}`, answer: vocabularies.english[key] });
+    // Математика (адаптивная сложность)
+    for (let i = 0; i < 5; i++) {
+        let a = Math.floor(Math.random() * 10 * userData.mathLevel) + 2;
+        let b = Math.floor(Math.random() * 10 * userData.mathLevel) + 2;
+        currentQuestions.push({ q: `${a} + ${b} = ?`, answer: a + b });
     }
-  }
 
-  currentQuestions = [...mathQ, ...vocabQ].slice(0, 20);
+    // Английский
+    if (lang === "english") {
+        for (let word in vocabularies.english) {
+            currentQuestions.push({ q: `Переведи: ${word}`, answer: vocabularies.english[word] });
+        }
+    }
 
-  currentQuestions.forEach((q, i) => {
-    let div = document.createElement("div");
-    div.innerHTML = `<p>${i + 1}. ${q.q}</p><input type="text" id="ans${i}">`;
-    document.getElementById("questions").appendChild(div);
-  });
+    currentQuestions.forEach((q, i) => {
+        let div = document.createElement("div");
+        div.className = "test-item";
+        div.innerHTML = `<label>${q.q}</label><input type="text" id="ans${i}">`;
+        questionsDiv.appendChild(div);
+    });
 }
 
 function checkAnswers() {
-  let score = 0;
-  currentQuestions.forEach((q, i) => {
-    let val = document.getElementById(`ans${i}`).value.trim().toLowerCase();
-    if (val == String(q.answer).toLowerCase()) score++;
-  });
-  document.getElementById("result").innerText = `Результат: ${score}/${currentQuestions.length}`;
+    let score = 0;
+    currentQuestions.forEach((q, i) => {
+        let val = document.getElementById(`ans${i}`).value.trim().toLowerCase();
+        if (val == String(q.answer).toLowerCase()) score++;
+    });
+
+    // Бонус к интеллекту при хорошем результате
+    if (score > currentQuestions.length / 2) {
+        userData.weekly.math += 2;
+        updateStats();
+        drawProgress();
+    }
+
+    document.getElementById("result").innerText = `Результат: ${score} из ${currentQuestions.length}. Опыт начислен!`;
 }
 
 // === Бизнес ===
 function evaluateBusiness() {
-  let input = document.getElementById("sellInput").value.toLowerCase();
-  let res = document.getElementById("businessResult");
-  if (input.includes("нужен") || input.includes("почему") || input.includes("лучший")) {
-    res.innerText = "ИИ: Отлично, убедил! Твоя харизма +1";
-  } else {
-    res.innerText = "ИИ: Слабовато, попробуй объяснить выгоду.";
-  }
+    let input = document.getElementById("sellInput").value.toLowerCase();
+    let res = document.getElementById("businessResult");
+    
+    const triggers = ["выгода", "скидка", "решение", "поможет", "вам"];
+    let success = triggers.some(t => input.includes(t));
+
+    if (success) {
+        res.innerHTML = "<span style='color:green'>ИИ: Достойный аргумент! Харизма +1</span>";
+        userData.weekly.confidence += 1;
+        updateStats();
+        drawProgress();
+    } else {
+        res.innerHTML = "<span style='color:orange'>ИИ: Это просто описание. Попробуй продать выгоду.</span>";
+    }
 }
 
-// === Инициализация языков ===
+// Инициализация
 window.onload = function() {
-  let sel = document.getElementById("languageSelect");
-  for (let key in vocabularies) {
-    let opt = document.createElement("option");
-    opt.value = key;
-    opt.textContent = key;
-    sel.appendChild(opt);
-  }
+    // Автозаполнение селекта
+    let sel = document.getElementById("languageSelect");
+    if (sel) {
+        sel.innerHTML = '<option value="math">Только Математика</option>';
+        for (let key in vocabularies) {
+            let opt = document.createElement("option");
+            opt.value = key;
+            opt.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+            sel.appendChild(opt);
+        }
+    }
 };
